@@ -1,0 +1,11 @@
+# Local secrets and settings (never commit these)
+includes/config.local.php
+
+# Uploaded cover images (keep the folder, ignore the files)
+assets/uploads/covers/*
+!assets/uploads/covers/.gitkeep
+
+# Editor / OS noise
+.DS_Store
+.idea/
+.vscode/
