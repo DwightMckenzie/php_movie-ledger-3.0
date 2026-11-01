@@ -1,0 +1,165 @@
+html,
+body {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  /* background-color: #000000; */
+}
+
+* {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #333;
+}
+
+h4, h3, p {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+p>strong {
+  color: #888;
+}
+
+
+.content-wrapper {
+  width: 100%;
+  padding: 50px 0px;
+  display: flex;
+  justify-content: center;
+}
+
+/* list page */
+.movie-container {
+  width: 1200px;
+}
+
+.movie-container.archive .movie-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.movie-container.archive .sidebar {
+  margin-bottom: 15px;
+  /* padding-top: 15px; */
+  padding-bottom: 15px;
+  border-right: 1px solid #555;
+  width: 18%;
+  margin-right: 10px;
+  position: sticky;
+  /* width: 175px;
+  position: fixed;
+  z-index: 1;
+  top: 20px;
+  left: 150px;
+  background: #eee;
+  overflow-x: hidden;
+  padding: 8px 0; */
+}
+
+.movie-container.archive .sidebar .section:not(:last-child) {
+  margin-bottom: 25px;
+}
+
+.movie-container.archive .sidebar .section form>div:not(:last-child) {
+  margin-bottom: 10px;
+}
+
+.movie-container.archive .sidebar .section-head {
+  border-bottom: 1px solid #555555;
+  margin-bottom: 10px;
+}
+
+.movie-container.archive .sidebar label {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  /* margin-bottom: 10px; */
+}
+
+.movie-container.archive .content {
+  width: 80%;
+}
+
+.movie-container.archive .content .section:not(:last-child) {
+  margin-bottom: 10px;
+}
+
+.movie-container.archive .content .section.head {
+  display: flex;
+  /* align-items: center; */
+  justify-content: flex-end;
+}
+
+.movie-container.archive .content .section.head .col:not(:last-child) {
+  margin-right: 10px;
+}
+
+.movie-container.archive .content .section.list {
+  height: 775px;
+  overflow: scroll;
+}
+
+
+/* list */
+table {
+  border-collapse: collapse;
+  /* table-layout: auto; */
+} 
+
+table thead th {
+  background: #cecece;
+  position: sticky;
+  top: 0;
+  /* Don't forget this, required for the stickiness */
+  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
+  text-align: start;
+}
+table tbody tr td {
+  width: 150px;
+  padding: 5px 0px;
+  font-size: 13px;
+}
+table tbody tr :first-child {
+  width: 500px;
+}
+
+/* Apply to even rows */
+table tr:nth-child(even) {
+  background-color: #f2f2f2;
+  /* Light gray */
+}
+
+
+
+/* single page */
+/* .movie-container.single {
+  width: 1200px;
+} */
+
+.movie-container.single .movie-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.movie-container.single .movie-wrapper .cover {
+  margin-right: 15px
+}
+
+.movie-container.single .movie-wrapper .details>div:not(:last-child),
+.movie-container.single .movie-wrapper .details form,
+.movie-container.single .movie-wrapper .details form>div:not(:last-child) {
+  margin-bottom: 15px;
+}
+
+
+.movie-container.archive .movie-wrapper .section.pagination {
+  display: flex;
+  justify-content: center;
+}
+
+.controls button.active {
+  background: #333;
+  color: #fff;
+}
