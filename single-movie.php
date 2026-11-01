@@ -1,209 +1,119 @@
 <?php
+declare(strict_types=1);
 
+require_once __DIR__ . '/includes/bootstrap.php';
+require_once __DIR__ . '/includes/movie-fields.php';
 
-	$pg_type = "single";
+require_login();
 
+$page_title = 'Movie details';
+$movie = null;
+$loadError = false;
 
-  /**
-   * Single page for showing movie details
-   * 
-   */
-  require_once('includes/config.php');  
-  
-  // for updating ??????
-  // if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    
-  // }
+$id = positive_int($_GET['id'] ?? null);
+if ($id !== null) {
+    try {
+        $movie = (new Movies(db()))->find($id);
+    } catch (Throwable $e) {
+        error_log('single-movie failed: ' . $e->getMessage());
+        $loadError = true;
+    }
+}
 
-  /**
-   * retrieve the selected movie ID
-   * create array for the loop
-   * 
-   */
-  $movieId = $_GET['id'];
-  $sql = "SELECT * FROM movie_list WHERE id=$movieId";
-  $result = $conn->query($sql);
+if ($movie === null) {
+    http_response_code($loadError ? 503 : 404);
+    $page_title = $loadError ? 'Unavailable' : 'Not found';
+    require __DIR__ . '/includes/header.php';
+    ?>
+    <div class="container py-5">
+		<h1 class="h4"><?= $loadError ? 'The movie list is unavailable right now.' : 'Movie not found.' ?></h1>
+		<a href="index.php" class="btn btn-secondary btn-sm mt-3">Return to list</a>
+	</div>
+    <?php
+    require __DIR__ . '/includes/footer.php';
+    exit;
+}
 
-  // head data
-  require_once("includes/header.php");
+$page_title = $movie['title'];
+$page_scripts = [];
+require __DIR__ . '/includes/header.php';
 
-  /**
-   * row data
-   */
-  while ($row = $result->fetch()) {
-
+$dash = static fn (?string $value): string => ($value === null || $value === '') ? '—' : $value;
 ?>
 
 <div class="container single">
+	<div class="row single movie-wrapper justify-content-center py-4 g-4">
 
-	<div class="row single movie-wrapper justify-content-center">
-
-		<main class="content col-md-4 justify-content-center">
-			<picture>
-				<img src="https://placehold.co/400x600" class="mx-auto d-block" alt="placholder" />
-				<figcaption class="figure-caption text-center">A caption for the above image.</figcaption>
-			</picture>
-		</main>
-		
-		<aside class="sidebar col-md-3 bg-light details">
-			
-			<div class="mb-3">
-				<h3>Movie Details:</h3>
-			</div>
-				
-			<div class="d-flex mb-3">
-				<p class="me-1"><strong>Title:</strong></p> 
-				<p><?php echo $row['title']; ?></p>
-			</div>
-			<div class="d-flex mb-3">
-				<p class="me-1"><strong>Type:</strong></p> 
-				<p><?php echo $row['type']; ?></p>
-			</div>
-			<div class="d-flex mb-3">
-				<p class="me-1"><strong>Category:</strong></p>
-				<p><?php echo $row['category']; ?></p>
-			</div>
-			<div class="d-flex mb-3">
-				<p class="me-1"><strong>Rating:</strong></p>
-				<p><?php echo $row['rating']; ?></p>
-			</div>
-			<div class="d-flex mb-3">
-				<p class="me-1"><strong>Release Date:</strong></p>
-				<p><?php echo $row['release_date']; ?></p>
-			</div>
-			<div class="d-flex mb-3">
-				<h3>Inventory Details:</strong></h3>
-			</div>
-			<div class="d-flex mb-3">
-				<p class="me-1"><strong>Entry Date:</strong></p>
-				<p><?php echo $row['entry_date']; ?></p>
-			</div>
-			<div class="mb-3">
-				<h3>Edit Details:</h3>
-			</div>
-			<div class="mb-3">
-				<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addMovieModal">Edit Details</button>
-				<!-- <a href="index.php" class="btn btn-outline-secondary btn-sm" target="_self">Return to List</a> -->
-			</div>
-		</aside>	
-
-	</div>
-
-	<!-- Add Movie Modal -->
-	<div class="row">
-		<div class="modal fade" id="addMovieModal" tabindex="-1" aria-labelledby="addMovieModalLabel" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">	
-					
-					<form method="post" action="controllers/movieUpdate.php?movie-id=<?php echo $row['id']; ?>">
-					
-						<div class="modal-header">
-							<h5 class="modal-title" id="addMovieModalLabel">Edit Details</h5>
-							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-						</div>
-					
-					
-						<div class="modal-body">
-					
-							<div class="mb-3">
-								<label for="movie-title" class="form-label"><strong>Title:</strong></label> 
-								<input type="text" class="form-control form-control-sm" name="movie-title" value="" placeholder="<?php echo $row['title']; ?>">
-							</div>
-							<div class="mb-3">
-								<label for="movie-type" class="form-label"><strong>Type:</strong></label>
-								<select class="form-select form-select-sm" name="movie-type" id="movie-type" value="">
-									<option value="all" selected>All</option>
-									<option value="Movie">Movie</option>
-									<option value="Series">Series</option>
-									<option value="Mini Series">Mini Series</option>
-								</select>
-							</div>
-							<div class="mb-3">
-								<label for="movie-category" class="form-label"><strong>Category:</strong></label>
-								<select class="form-select form-select-sm" name="movie-category" id="movie-category" value="">
-									<option value="all" selected>All</option>
-									<option value="Action">Action</option>
-									<option value="Adventure">Adventure</option>
-									<option value="Classic">Classic</option>
-									<option value="Comedy">Comedy</option>
-									<option value="Crime">Crime</option>
-									<option value="Documentary">Documentary</option>
-									<option value="Drama">Drama</option>
-									<option value="Family">Family</option>
-									<option value="Fantasy">Fantasy</option>
-									<option value="Horror">Horror</option>
-									<option value="Romance">Romance</option>
-									<option value="Scifi">Sci-fi</option>
-									<option value="Thriller">Thriller</option>
-									<option value="Western">Western</option>
-								</select>
-							</div>
-							<div class="mb-3">
-								<label for="movie-rating" class="form-label"><strong>Rating:</strong></label>
-								<select class="form-select form-select-sm" name="movie-rating" id="movie-rating" value="">
-									<option value="all" selected>All</option>
-									<option value="R">R</option>
-									<option value="NR">NR</option>
-									<option value="PG">PG</option>
-									<option value="PG-13">PG-13</option>
-									<option value="M">Mature</option>
-								</select>
-							</div>
-														
-							<div class="mb-3">
-								<label for="movie-release" class="form-label"><strong>Release Date:</strong></label>
-								<input type="date" class="form-control form-control-sm" name="movie-release" id="movie-release" value="">
-							</div>
-							
-							<div class="mb-3">
-								<label for="notesInput" class="form-label">Notes</label>
-								<textarea class="form-control" id="notesInput" rows="2"></textarea>
-							</div>
-							
-							<!-- <div>
-							<label for="movie-title">Title:</label> 
-							<input type="text" name="movie-title" value="" placeholder="<php echo $row['title']; ?>">
-							</div>     
-							<div>
-							<label for="movie-type">Type:</label> 
-							<input type="text" name="movie-type" value="" placeholder="<php echo $row['type']; ?>">
-							</div>     
-							<div>
-							<label for="movie-category">Category:</label>
-							<input type="text" name="movie-category" value="" placeholder="<php echo $row['category']; ?>">
-							</div>     
-							<div>
-							<label for="movie-rating">Rating:</label>
-							<input type="text" name="movie-rating" value="" placeholder="<php echo $row['rating']; ?>">
-							</div> -->
-							<!-- <div>
-							<input type="hidden" name="movie-id" value="<php echo $row['id']; ?>">
-							</div> -->
-							
-							<div class="modal-footer">
-								<button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-								<button type="submit" class="btn btn-primary btn-sm" id="update-movie" >Update</button>
-								<a href="controllers/movieDelete.php?movie-id=<?php echo $row['id']; ?>" class="btn btn-danger btn-sm" target="_self" role="button">Delete</a>
-							</div>
-							
-						</div>
-							
-					</form>
-						
+		<main class="content col-md-4">
+			<?php if (!empty($movie['cover'])): ?>
+				<img src="<?= e($movie['cover']) ?>" class="img-fluid d-block mx-auto rounded"
+					 alt="Cover of <?= e($movie['title']) ?>">
+			<?php else: ?>
+				<div class="cover-placeholder d-flex align-items-center justify-content-center text-muted bg-light border rounded mx-auto"
+					 style="aspect-ratio: 2 / 3; max-width: 400px;" role="img" aria-label="No cover image">
+					No cover
 				</div>
+			<?php endif; ?>
+		</main>
+
+		<aside class="sidebar col-md-4 col-lg-3 details">
+			<h3 class="h4 mb-3"><?= e($movie['title']) ?></h3>
+
+			<dl class="row mb-4">
+				<dt class="col-5 text-muted">Type</dt>
+				<dd class="col-7"><?= e($movie['type']) ?></dd>
+				<dt class="col-5 text-muted">Category</dt>
+				<dd class="col-7"><?= e(Movies::CATEGORIES[$movie['category']] ?? $movie['category']) ?></dd>
+				<dt class="col-5 text-muted">Rating</dt>
+				<dd class="col-7"><?= e(Movies::RATINGS[$movie['rating']] ?? $movie['rating']) ?></dd>
+				<dt class="col-5 text-muted">Release date</dt>
+				<dd class="col-7"><?= e($dash($movie['release_date'])) ?></dd>
+				<dt class="col-5 text-muted">Entry date</dt>
+				<dd class="col-7"><?= e($dash($movie['entry_date'])) ?></dd>
+			</dl>
+
+			<h4 class="h6 text-uppercase text-muted fw-bold">Notes</h4>
+			<p class="mb-4"><?= $movie['note'] ? nl2br(e($movie['note'])) : '<span class="text-muted">No notes.</span>' ?></p>
+
+			<div class="d-flex flex-wrap gap-2">
+				<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editMovieModal">Edit details</button>
+				<a href="index.php" class="btn btn-secondary btn-sm">Return to list</a>
 			</div>
-		</div>
+
+			<form method="post" action="controllers/movieDelete.php" class="mt-4"
+				  data-confirm="Delete “<?= e($movie['title']) ?>”? This cannot be undone.">
+				<?= csrf_field() ?>
+				<input type="hidden" name="id" value="<?= (int) $movie['id'] ?>">
+				<button type="submit" class="btn btn-outline-danger btn-sm">Delete movie</button>
+			</form>
+		</aside>
 	</div>
-	
 </div>
 
+<!-- Edit movie -->
+<div class="modal fade" id="editMovieModal" tabindex="-1" aria-labelledby="editMovieModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-scrollable">
+		<div class="modal-content">
+			<form method="post" action="controllers/movieUpdate.php" enctype="multipart/form-data">
+				<?= csrf_field() ?>
+				<input type="hidden" name="id" value="<?= (int) $movie['id'] ?>">
+				<div class="modal-header">
+					<h5 class="modal-title" id="editMovieModalLabel">Edit details</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<?= render_movie_fields('edit-', $movie) ?>
+					<?php if (!empty($movie['cover'])): ?>
+						<p class="small text-muted mb-0">Uploading a new image replaces the current cover.</p>
+					<?php endif; ?>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+					<button type="submit" class="btn btn-primary btn-sm">Save changes</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
 
-
-<!-- </div> -->
-
-<?php
-
-  } // for the while loop
-
-  require_once("includes/footer.php");
-?>
+<?php require __DIR__ . '/includes/footer.php'; ?>
