@@ -1,17 +1,17 @@
 <?php
-declare(strict_types=1);
+	declare(strict_types=1);
 
-/**
- * Page header. Expects these variables from the calling page:
- *   $page_title (string), $show_nav (bool, default true), $page_scripts (list of paths).
- * Also pulls any pending flash messages.
- */
+	/**
+	 * Page header. Expects these variables from the calling page:
+	 *   $page_title (string), $show_nav (bool, default true), $page_scripts (list of paths).
+	 * Also pulls any pending flash messages.
+	 */
 
-$page_title = $page_title ?? 'Movie Ledger';
-$show_nav = $show_nav ?? true;
-$base = app_base_url();
-$flashes = flash_pull();
-?>
+	$page_title = $page_title ?? 'Movie Ledger';
+	$show_nav = $show_nav ?? true;
+	$base = app_base_url();
+	$flashes = flash_pull();
+	?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,25 +26,40 @@ $flashes = flash_pull();
 	<link rel="stylesheet" href="<?= e($base) ?>assets/styles/style.css">
 </head>
 <body>
+
+<?php if ($show_nav && is_logged_in()): ?>
 <nav class="navbar navbar-light bg-light sticky-top shadow-sm">
 	<div class="container-fluid">
 		<a class="navbar-brand mb-0 h1" href="<?= e($base) ?>index.php">
 			<i class="bi bi-film me-2"></i>Movie Ledger
 		</a>
-		<?php if ($show_nav && is_logged_in()): ?>
+		
 			<ul class="nav align-items-center">
-				<li class="nav-item"><a class="nav-link" href="<?= e($base) ?>index.php">Movies</a></li>
-				<li class="nav-item"><a class="nav-link" href="<?= e($base) ?>ajax/movie-export.php">Export CSV</a></li>
-				<li class="nav-item">
-					<form method="post" action="<?= e($base) ?>logout.php" class="m-0">
-						<?= csrf_field() ?>
-						<button type="submit" class="btn btn-link nav-link">Log out</button>
-					</form>
+			
+				
+				<li <?php echo $page_type == 'single' ? '' : 'hidden'; ?>><a class="nav-item" href="<?= e($base) ?>index.php">Back to List</a></li>
+			
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+						<i class="bi bi-gear"></i>
+					</a>
+					<ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+						<!-- <li><a class="dropdown-item" href="#">Action</a></li> -->
+						
+						<li><a class="dropdown-item" href="<?= e($base) ?>ajax/movie-export.php">Export CSV</a></li>
+						<li>
+							<form method="post" action="<?= e($base) ?>logout.php" class="m-0">
+								<?= csrf_field() ?>
+								<button type="submit" class="btn btn-link dropdown-item">Log out</button>
+							</form>
+						</li>					
+					</ul>
 				</li>
+				
 			</ul>
-		<?php endif; ?>
 	</div>
 </nav>
+<?php endif; ?>
 
 <?php foreach ($flashes as $flash): ?>
 	<div class="container-fluid px-3 pt-3">

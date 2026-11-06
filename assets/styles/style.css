@@ -21,6 +21,12 @@ p>strong {
 }
 
 
+.dropdown-menu[data-bs-popper] {
+	left: -90px;
+}
+
+
+
 .content-wrapper {
   width: 100%;
   padding: 50px 0px;
